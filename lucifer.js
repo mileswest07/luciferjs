@@ -104,17 +104,25 @@ var luciferjs = {
   keyConversion: function(key_pt) {
     this.key = [ ];
     
-    for ( var i = 0; i < 32; i++ ) {
-      var bin_chars = parseInt( key_pt[ i ], 16 ).toString( 2 ).split( "" );
+    for ( var i = 0; i < 32; i+=2 ) {
+      var bin_charsHi = parseInt( key_pt[   i   ], 16 ).toString( 2 ).split( "" ),
+          bin_charsLo = parseInt( key_pt[ i + 1 ], 16 ).toString( 2 ).split( "" );
       
       for ( var k = 0; k < 4; k++ ) {
-        if ( bin_chars[ k ] != '0' && bin_chars[ k ] != '1' ) {
-          bin_chars.unshift( 0 );
+        if ( bin_charsHi[ k ] != '0' && bin_charsHi[ k ] != '1' ) {
+          bin_charsHi.unshift( 0 );
         }
-        bin_chars[ k ] = parseInt( bin_chars[ k ], 2 );
+        bin_charsHi[ k ] = parseInt( bin_charsHi[ k ], 2 );
+        
+        if ( bin_charsLo[ k ] != '0' && bin_charsLo[ k ] != '1' ) {
+          bin_charsLo.unshift( 0 );
+        }
+        bin_charsLo[ k ] = parseInt( bin_charsLo[ k ], 2 );
       }
-      bin_chars.reverse();
-      this.key = this.key.concat( bin_chars );
+      
+      bin_charsHi.reverse();
+      bin_charsLo.reverse();
+      this.key = this.key.concat( bin_charsLo, bin_charsHi );
     }
     
     //console.log('key', this.key);
@@ -123,17 +131,24 @@ var luciferjs = {
   msgConversion: function(msg_pt) {
     this.message = [ ];
     
-    for ( var i = 0; i < 32; i++ ) {
-      var bin_chars = parseInt( msg_pt[ i ], 16 ).toString( 2 ).split( "" );
+    for ( var i = 0; i < 32; i+=2 ) {
+      var bin_charsHi = parseInt( msg_pt[   i   ], 16 ).toString( 2 ).split( "" ),
+          bin_charsLo = parseInt( msg_pt[ i + 1 ], 16 ).toString( 2 ).split( "" );
       for ( var k = 0; k < 4; k++ ) {
-        if ( bin_chars[ k ] != '0' && bin_chars[ k ] != '1' ) {
-          bin_chars.unshift( 0 );
+        if ( bin_charsHi[ k ] != '0' && bin_charsHi[ k ] != '1' ) {
+          bin_charsHi.unshift( 0 );
         }
-        bin_chars[ k ] = parseInt( bin_chars[ k ], 2 );
+        bin_charsHi[ k ] = parseInt( bin_charsHi[ k ], 2 );
+        
+        if ( bin_charsLo[ k ] != '0' && bin_charsLo[ k ] != '1' ) {
+          bin_charsLo.unshift( 0 );
+        }
+        bin_charsLo[ k ] = parseInt( bin_charsLo[ k ], 2 );
       }
       
-      bin_chars.reverse();
-      this.message = this.message.concat( bin_chars );
+      bin_charsHi.reverse();
+      bin_charsLo.reverse();
+      this.message = this.message.concat( bin_charsLo, bin_charsHi );
     }
   },
   
@@ -143,11 +158,11 @@ var luciferjs = {
       for ( var c = 0; c < 32; c += 2 ) {
         //console.log('key range', ( c * 4 ), ' - ', ( ( c + 1) * 4 ) + 3);
         
-        var lo = this.key [ ( ( c + 1) * 4 ) + 3 ] * 8
+        var hi = this.key [ ( ( c + 1) * 4 ) + 3 ] * 8
                + this.key [ ( ( c + 1) * 4 ) + 2 ] * 4
                + this.key [ ( ( c + 1) * 4 ) + 1 ] * 2
                + this.key [ ( ( c + 1) * 4 ) + 0 ],
-            hi = this.key [ ( ( c + 0) * 4 ) + 3 ] * 8
+            lo = this.key [ ( ( c + 0) * 4 ) + 3 ] * 8
                + this.key [ ( ( c + 0) * 4 ) + 2 ] * 4
                + this.key [ ( ( c + 0) * 4 ) + 1 ] * 2
                + this.key [ ( ( c + 0) * 4 ) + 0 ];
@@ -170,11 +185,11 @@ var luciferjs = {
     var response = '';
     
       for ( var c = 0; c < 32; c += 2 ) {
-        var lo = this.message [ ( ( c + 1) * 4 ) + 3 ] * 8
+        var hi = this.message [ ( ( c + 1) * 4 ) + 3 ] * 8
                + this.message [ ( ( c + 1) * 4 ) + 2 ] * 4
                + this.message [ ( ( c + 1) * 4 ) + 1 ] * 2
                + this.message [ ( ( c + 1) * 4 ) + 0 ],
-            hi = this.message [ ( ( c + 0) * 4 ) + 3 ] * 8
+            lo = this.message [ ( ( c + 0) * 4 ) + 3 ] * 8
                + this.message [ ( ( c + 0) * 4 ) + 2 ] * 4
                + this.message [ ( ( c + 0) * 4 ) + 1 ] * 2
                + this.message [ ( ( c + 0) * 4 ) + 0 ];
